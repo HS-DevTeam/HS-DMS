@@ -1,15 +1,10 @@
-name: HS-DMS CI
+name: CI - Build & Test
 
 on:
   push:
-    branches:
-      - main
-      - develop
-
+    branches: ["main", "develop"]
   pull_request:
-    branches:
-      - main
-      - develop
+    branches: ["main"]
 
 jobs:
   build:
@@ -22,7 +17,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 10.0.x
 
       - name: Restore
         run: dotnet restore
@@ -32,15 +27,3 @@ jobs:
 
       - name: Test
         run: dotnet test --configuration Release --no-build
-
-      - name: Publish
-        run: |
-          dotnet publish DMS.Api/DMS.Api.csproj \
-          -c Release \
-          -o publish
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: hs-dms-api
-          path: publish
