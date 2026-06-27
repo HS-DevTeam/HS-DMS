@@ -1,0 +1,27 @@
+# Build
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# VS Code
+.vscode/
+
+# Rider
+.idea/
+
+# Logs
+*.log
+
+# Test Results
+TestResults/
+
+# Publish
+publish/
+
+# OS
+.DS_Store
+Thumbs.db
