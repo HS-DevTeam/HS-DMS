@@ -34,7 +34,7 @@ builder.Services.AddScoped<IDocumentAnalyzer, RuleBasedDocumentAnalyzer>();
 
 var app = builder.Build();
 
-// Swagger
+// Swagger configuration
 app.UseSwagger();
 
 app.UseSwaggerUI(c =>
