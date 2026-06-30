@@ -3,10 +3,10 @@ using DMS.Application.Contracts;
 using DMS.Application.Services;
 using DMS.Infrastructure.Analysis;
 using DMS.Infrastructure.Readers;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Controllers + JSON
 builder.Services
     .AddControllers()
     .AddJsonOptions(options =>
@@ -15,34 +15,60 @@ builder.Services
             .Add(new JsonStringEnumConverter());
     });
 
-// Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "HS-DMS API",
+        Version = "v1",
+        Description =
+            """
+            Sistema de validação documental da Harmonia Seguros.
+
+            Funcionalidades:
+            - Upload de documentos
+            - Deteção automática do tipo documental
+            - Validação baseada em regras
+            - OCR (futuro)
+            - Extração de metadados (futuro)
+            """,
+        Contact = new OpenApiContact
+        {
+            Name = "HS Developer Team"
+        }
+    });
+
+    var xmlFile =
+        $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+
+    var xmlPath =
+        Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+    options.IncludeXmlComments(xmlPath, true);
+});
 
 // Application
 builder.Services.AddScoped<IDocumentValidationService, DocumentValidationService>();
 
-// Readers
+// Infrastructure
 builder.Services.AddScoped<TextDocumentReader>();
 builder.Services.AddScoped<ExcelDocumentReader>();
 builder.Services.AddScoped<PdfDocumentReader>();
 
 builder.Services.AddScoped<IDocumentReader, CompositeDocumentReader>();
-
-// Analyzer
 builder.Services.AddScoped<IDocumentAnalyzer, RuleBasedDocumentAnalyzer>();
 
 var app = builder.Build();
 
-// Swagger configuration
 app.UseSwagger();
 
-app.UseSwaggerUI(c =>
+app.UseSwaggerUI(options =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "DMS API V1");
-
-    // Abre Swagger na raiz:
-    c.RoutePrefix = string.Empty;
+    options.DocumentTitle = "HS-DMS API";
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "HS-DMS API v1");
+    options.RoutePrefix = "swagger";
 });
 
 app.MapControllers();

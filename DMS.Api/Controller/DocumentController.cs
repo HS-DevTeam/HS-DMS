@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DMS.Api.Controllers;
 
+/// <summary>
+/// Operações de validação documental.
+/// </summary>
 [ApiController]
 [Route("api/documents")]
 public sealed class DocumentsController : ControllerBase
@@ -17,7 +20,42 @@ public sealed class DocumentsController : ControllerBase
         _service = service;
     }
 
+    /// <summary>
+    /// Valida um documento submetido pelo utilizador.
+    /// </summary>
+    /// <remarks>
+    /// Exemplos de utilização:
+    ///
+    /// - EmployeeList.xlsx → EmployeeList
+    /// - VehicleList.xlsx → VehicleList
+    /// - Certidao_Comercial.pdf → CommercialCertificate
+    ///
+    /// O sistema:
+    /// - lê o conteúdo do documento;
+    /// - identifica automaticamente o tipo documental;
+    /// - calcula um nível de confiança;
+    /// - valida contra o tipo esperado.
+    /// </remarks>
+    /// <param name="request">
+    /// Pedido contendo o ficheiro e o tipo documental esperado.
+    /// </param>
+    /// <param name="cancellationToken">
+    /// Token de cancelamento da operação.
+    /// </param>
+    /// <returns>
+    /// Resultado da validação documental.
+    /// </returns>
+    /// <response code="200">
+    /// Documento processado com sucesso.
+    /// </response>
+    /// <response code="400">
+    /// Ficheiro não enviado ou inválido.
+    /// </response>
     [HttpPost("validate")]
+    [Consumes("multipart/form-data")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(ValidateDocumentResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Validate(
         [FromForm] ValidateDocumentRequest request,
         CancellationToken cancellationToken)
