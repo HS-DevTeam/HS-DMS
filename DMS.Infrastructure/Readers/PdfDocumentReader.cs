@@ -3,7 +3,6 @@ using DMS.Application.Contracts;
 using DMS.Domain.Documents;
 using System.Text;
 using DMS.Application.Results;
-using DMS.Infrastructure.Readers;
 
 namespace DMS.Infrastructure.Readers;
 
