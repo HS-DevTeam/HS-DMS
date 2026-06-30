@@ -1,4 +1,4 @@
-using DMS.Application.Services;
+using DMS.Application.Results;
 using DMS.Domain.Documents;
 namespace DMS.Application.Contracts;
 

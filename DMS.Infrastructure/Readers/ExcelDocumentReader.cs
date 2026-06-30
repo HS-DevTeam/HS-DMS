@@ -1,6 +1,6 @@
 using ClosedXML.Excel;
 using DMS.Application.Contracts;
-using DMS.Application.Services;
+using DMS.Application.Results;
 using DMS.Domain.Documents;
 using System.Text;
 

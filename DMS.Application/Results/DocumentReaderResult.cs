@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DMS.Application.Services
+namespace DMS.Application.Results
 {
     public sealed record DocumentReadResult(
     string Text,

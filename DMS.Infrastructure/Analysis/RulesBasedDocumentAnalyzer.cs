@@ -1,5 +1,7 @@
+using System.Globalization;
+using System.Text;
 using DMS.Application.Contracts;
-using DMS.Application.Services;
+using DMS.Application.Results;
 using DMS.Domain.Documents;
 
 namespace DMS.Infrastructure.Analysis;
@@ -10,7 +12,8 @@ public sealed class RuleBasedDocumentAnalyzer : IDocumentAnalyzer
         DocumentReadResult input,
         CancellationToken cancellationToken = default)
     {
-        var content = Normalize(input.Text);
+        // 1. Normaliza o texto removendo acentos de forma robusta
+        var content = RemoveAccents(input.Text.ToLowerInvariant());
 
         var scores = Enum.GetValues<DocType>()
             .Where(t => t != DocType.Unknown)
@@ -24,17 +27,19 @@ public sealed class RuleBasedDocumentAnalyzer : IDocumentAnalyzer
 
         var best = scores.First();
 
+        // Se a pontuação máxima for 0, garante que o tipo retorna Unknown
+        var detectedType = best.Score > 0 ? best.Type : DocType.Unknown;
+
         return Task.FromResult(new DocAnalysis
         {
-            DocumentType = best.Type,
+            DocumentType = detectedType,
             Confidence = best.Score / 100m
         });
     }
 
-    private static int GetScore(
-        DocType type,
-        string content)
+    private static int GetScore(DocType type, string content)
     {
+        // NOTA: Todas as palavras-chave aqui DEVEM estar em minúsculas e SEM acentos/cedilhas
         return type switch
         {
             DocType.EmployeeList => CalculateScore(
@@ -62,21 +67,16 @@ public sealed class RuleBasedDocumentAnalyzer : IDocumentAnalyzer
                     ["certidao"] = 35,
                     ["certidao comercial"] = 35,
                     ["certificacao comercial"] = 35,
-
                     ["conservatoria"] = 20,
                     ["registo comercial"] = 20,
                     ["registos comerciais"] = 20,
-
                     ["matricula"] = 15,
                     ["matricula comercial"] = 15,
-
                     ["natureza juridica"] = 15,
                     ["sociedade por quotas"] = 15,
                     ["limitada"] = 15,
                     ["lda"] = 15,
-
                     ["capital social"] = 10,
-
                     ["nif"] = 5,
                     ["denominacao social"] = 5
                 }),
@@ -85,9 +85,7 @@ public sealed class RuleBasedDocumentAnalyzer : IDocumentAnalyzer
         };
     }
 
-    private static int CalculateScore(
-        string content,
-        IDictionary<string, int> keywords)
+    private static int CalculateScore(string content, IDictionary<string, int> keywords)
     {
         var score = 0;
 
@@ -102,22 +100,26 @@ public sealed class RuleBasedDocumentAnalyzer : IDocumentAnalyzer
         return Math.Min(score, 100);
     }
 
-    private static string Normalize(string text)
+    /// <summary>
+    /// Remove acentos de forma eficiente usando FormD (Separation of diacritics)
+    /// </summary>
+    private static string RemoveAccents(string text)
     {
-        text = text.ToLowerInvariant();
+        if (string.IsNullOrWhiteSpace(text)) return string.Empty;
 
-        return text
-            .Replace("á", "a")
-            .Replace("à", "a")
-            .Replace("â", "a")
-            .Replace("ã", "a")
-            .Replace("é", "e")
-            .Replace("ê", "e")
-            .Replace("í", "i")
-            .Replace("ó", "o")
-            .Replace("ô", "o")
-            .Replace("õ", "o")
-            .Replace("ú", "u")
-            .Replace("ç", "c");
+        var normalizedString = text.Normalize(NormalizationForm.FormD);
+        var stringBuilder = new StringBuilder(normalizedString.Length);
+
+        foreach (var c in normalizedString)
+        {
+            var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+            {
+                stringBuilder.Append(c);
+            }
+        }
+
+        // Substituição especial para o 'ç' que por vezes não decompõe isolado em algumas normalizações
+        return stringBuilder.ToString().Normalize(NormalizationForm.FormC).Replace("ç", "c");
     }
 }
