@@ -21,4 +21,5 @@ public sealed class OcrDocumentReader : IDocumentReader
 
         return Task.FromResult(new DocumentReadResult(text));
     }
+    
 }
