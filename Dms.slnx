@@ -3,5 +3,4 @@
   <Project Path="DMS.Application/DMS.Application.csproj" />
   <Project Path="DMS.Domain/DMS.Domain.csproj" />
   <Project Path="DMS.Infrastructure/DMS.Infrastructure.csproj" />
-  <Project Path="DMS.Test/DMS.Test.csproj" />
 </Solution>
