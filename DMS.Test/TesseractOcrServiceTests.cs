@@ -1,5 +1,4 @@
-using DMS.Infrastructure.OCR;
-using Xunit;
+using DMS.Infrastructure.Services;
 
 namespace DMS.Tests.Ocr;
 
@@ -12,10 +11,10 @@ public class TesseractOcrServiceTests
         var path = Path.Combine(AppContext.BaseDirectory, "Assets", "test_sample.png");
         var bytes = File.ReadAllBytes(path);
 
-        var ocr = new TesseractOcrService();
+        var ocr = new TesseractCliOcrService();
 
         // Act
-        var result = ocr.ExtractText(bytes);
+        var result = ocr.ExtractText(bytes, "image/png");
 
         // Assert
         Assert.False(string.IsNullOrWhiteSpace(result));

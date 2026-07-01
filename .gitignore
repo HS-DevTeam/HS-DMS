@@ -1,7 +1,7 @@
 # Build
 bin/
 obj/
-python/.venv*
+
 
 # Visual Studio
 .vs/
@@ -26,3 +26,4 @@ publish/
 # OS
 .DS_Store
 Thumbs.db
+DMS.Test/TesseractOcrServiceTests.cs
