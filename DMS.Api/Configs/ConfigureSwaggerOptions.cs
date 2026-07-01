@@ -23,29 +23,37 @@ public sealed class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOption
         }
     }
 
-    private static OpenApiInfo CreateInfoForVersion(ApiVersionDescription description)
+    private static OpenApiInfo CreateInfoForVersion(
+        ApiVersionDescription description)
     {
         var info = new OpenApiInfo
         {
             Title = "HS-DMS API",
             Version = description.ApiVersion.ToString(),
-            Description = 
+            Description =
                 """
                 Sistema de validação documental da Harmonia Seguros.
-                
+
                 Funcionalidades:
                 - Upload de documentos
+                - Leitura de PDF, Excel e Texto
+                - OCR para documentos digitalizados
                 - Deteção automática do tipo documental
-                - Validação baseada em regras
-                - OCR (Implementado)
+                - Classificação baseada em keywords
+                - Tipos documentais globais e por tenant
+                - Validação documental com score de confiança
                 - Extração de metadados (futuro)
                 """,
-            Contact = new OpenApiContact { Name = "HS Developer Team" }
+            Contact = new OpenApiContact
+            {
+                Name = "HS Developer Team"
+            }
         };
 
         if (description.IsDeprecated)
         {
-            info.Description += " ⚠️ **Esta versão foi descontinuada (Deprecated).**";
+            info.Description +=
+                "\n\n⚠️ Esta versão foi descontinuada (Deprecated).";
         }
 
         return info;

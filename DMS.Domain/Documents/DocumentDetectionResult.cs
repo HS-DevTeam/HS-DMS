@@ -1,8 +1,8 @@
-namespace DMS.Domain.Documents
-{
-    public sealed record DocumentDetectionResult(
-        DocType DetectedType,
-        decimal Confidence,
-        IReadOnlyList<(DocType Type, decimal Score)> Rankings
-    );
-}
+namespace DMS.Domain.Documents;
+
+public sealed record DocumentDetectionResult(
+    Guid? DetectedTypeId,
+    string? DetectedTypeName,
+    decimal Confidence,
+    IReadOnlyList<DocumentDetectionRanking> Rankings
+);

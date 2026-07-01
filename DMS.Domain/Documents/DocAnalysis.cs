@@ -1,21 +1,16 @@
-using System.Collections.ObjectModel;
-
 namespace DMS.Domain.Documents;
 
 public sealed class DocAnalysis
 {
-    public DocType DocumentType { get; init; }
+    public Guid? DocumentTypeId { get; init; }
 
-    private decimal _confidence;
-    public decimal Confidence
-    {
-        get => _confidence;
-        init => _confidence = value is >= 0 and <= 1
-            ? value
-            : throw new ArgumentOutOfRangeException(nameof(Confidence));
-    }
+    public string? DocumentTypeName { get; init; }
+
+    public decimal Confidence { get; init; }
+
+    public IReadOnlyList<string> MatchedKeywords { get; init; }
+        = Array.Empty<string>();
 
     public IReadOnlyDictionary<string, string> Metadata { get; init; }
-        = new ReadOnlyDictionary<string, string>(
-            new Dictionary<string, string>());
+        = new Dictionary<string, string>();
 }

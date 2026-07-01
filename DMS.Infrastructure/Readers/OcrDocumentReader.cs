@@ -13,12 +13,24 @@ public sealed class OcrDocumentReader : IDocumentReader
         _ocr = ocr;
     }
 
-    public Task<DocumentReadResult> ReadAsync(
+    public async Task<DocumentReaderResult> ReadAsync(
         UploadedDocument document,
         CancellationToken cancellationToken = default)
     {
-        var text = _ocr.ExtractText(document.Content, document.ContentType);
+        cancellationToken.ThrowIfCancellationRequested();
 
-        return Task.FromResult(new DocumentReadResult(text));
+        var text = await _ocr.ExtractTextAsync(
+            document.Content,
+            document.ContentType,
+            cancellationToken);
+
+        return new DocumentReaderResult(
+            text,
+            new Dictionary<string, string>
+            {
+                ["Reader"] = "OCR",
+                ["FileName"] = document.FileName,
+                ["ContentType"] = document.ContentType
+            });
     }
 }

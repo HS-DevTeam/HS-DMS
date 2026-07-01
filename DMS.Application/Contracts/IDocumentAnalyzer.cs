@@ -2,8 +2,11 @@ using DMS.Application.Results;
 using DMS.Domain.Documents;
 
 namespace DMS.Application.Contracts;
-
 public interface IDocumentAnalyzer
 {
-    Task<DocAnalysis> AnalyzeAsync(DocumentReadResult input, CancellationToken cancellationToken = default);
+    Task<DocAnalysis> AnalyzeAsync(
+        Guid tenantId,
+        DocumentReaderResult input,
+        CancellationToken cancellationToken = default
+    );
 }

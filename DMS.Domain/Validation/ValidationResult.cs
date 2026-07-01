@@ -5,20 +5,22 @@ namespace DMS.Domain.Validation;
 public sealed class ValidationResult
 {
     public ValidationResult(
-        DocType expectedType,
+        Guid expectedDocumentTypeId,
         DocAnalysis analysis,
         bool accepted,
         IReadOnlyCollection<string>? reasons = null)
     {
-        ExpectedType = expectedType;
+        ExpectedDocumentTypeId = expectedDocumentTypeId;
         Analysis = analysis;
         Accepted = accepted;
         Reasons = reasons ?? [];
     }
 
-    public DocType ExpectedType { get; }
+    public Guid ExpectedDocumentTypeId { get; }
+
     public DocAnalysis Analysis { get; }
+
     public bool Accepted { get; }
+
     public IReadOnlyCollection<string> Reasons { get; }
 }
-

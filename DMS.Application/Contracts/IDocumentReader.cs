@@ -4,7 +4,7 @@ namespace DMS.Application.Contracts;
 
 public interface IDocumentReader
 {
-    Task<DocumentReadResult> ReadAsync(
+    Task<DocumentReaderResult> ReadAsync(
         UploadedDocument document,
         CancellationToken cancellationToken = default);
 }

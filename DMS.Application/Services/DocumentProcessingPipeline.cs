@@ -21,24 +21,35 @@ public sealed class DocumentProcessingPipeline : IDocumentProcessingPipeline
     }
 
     public async Task<DocAnalysis> ProcessAsync(
+        Guid tenantId,
         UploadedDocument document,
         CancellationToken cancellationToken = default)
     {
-        // 1. leitura inicial
-        var readResult = await _reader.ReadAsync(document, cancellationToken);
+        // 1. Leitura inicial
+        var readResult = await _reader.ReadAsync(
+            document,
+            cancellationToken);
 
         var text = readResult.Text;
-
-        // 2. fallback OCR
+    
+        // 2. Fallback OCR
         if (string.IsNullOrWhiteSpace(text))
         {
-            text = _ocr.ExtractText(document.Content, document.ContentType);
+            text = await _ocr.ExtractTextAsync(
+                document.Content,
+                document.ContentType,
+                cancellationToken);
         }
 
-        // 3. normalizar input para analyzer
-        var normalized = new DocumentReadResult(text);
+        // 3. Normalizar para o Analyzer
+        var normalized = new DocumentReaderResult(
+            text,
+            readResult.Metadata);
 
-        // 4. análise final
-        return await _analyzer.AnalyzeAsync(normalized, cancellationToken);
+        // 4. Análise final
+        return await _analyzer.AnalyzeAsync(
+            tenantId,
+            normalized,
+            cancellationToken);
     }
 }

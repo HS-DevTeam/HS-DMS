@@ -7,7 +7,8 @@ namespace DMS.Application.Services;
 
 public sealed class DocumentValidationService(
     IDocumentReader reader,
-    IDocumentAnalyzer analyzer) : IDocumentValidationService
+    IDocumentAnalyzer analyzer)
+    : IDocumentValidationService
 {
     private readonly IDocumentReader _reader = reader;
     private readonly IDocumentAnalyzer _analyzer = analyzer;
@@ -21,32 +22,29 @@ public sealed class DocumentValidationService(
             cancellationToken);
 
         var analysis = await _analyzer.AnalyzeAsync(
+            request.TenantId,
             content,
             cancellationToken);
 
-        var isSameType = analysis.DocumentType == request.ExpectedType;
-
-        var confidence = isSameType
-            ? analysis.Confidence
-            : 0m;
+        var isSameType =
+            analysis.DocumentTypeId ==
+            request.ExpectedDocumentTypeId;
 
         var accepted =
             isSameType &&
-            confidence >= 0.85m;
+            analysis.Confidence >= 0.85m;
 
         var reasons = accepted
-            ? []
-            : new[] { "Erro de Validação de Documento" };
+            ? Array.Empty<string>()
+            : new[]
+            {
+                "O documento não corresponde ao tipo esperado."
+            };
 
         return new ValidationResult(
-            request.ExpectedType,
-            new DocAnalysis
-            {
-                DocumentType = analysis.DocumentType,
-                Confidence = confidence
-            },
+            request.ExpectedDocumentTypeId,
+            analysis,
             accepted,
-            reasons
-        );
+            reasons);
     }
 }

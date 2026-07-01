@@ -7,5 +7,8 @@ namespace DMS.Application.Contracts;
 
 public interface IOcrService
 {
-    string ExtractText(byte[] fileBytes, string contentType);
+    Task<string> ExtractTextAsync(
+        byte[] fileBytes,
+        string contentType,
+        CancellationToken cancellationToken = default);
 }

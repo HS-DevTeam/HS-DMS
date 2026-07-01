@@ -7,16 +7,22 @@ namespace DMS.Infrastructure.Readers;
 
 public sealed class TextDocumentReader : IDocumentReader
 {
-    public Task<DocumentReadResult> ReadAsync(
+    public Task<DocumentReaderResult> ReadAsync(
         UploadedDocument document,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         var text = Encoding.UTF8.GetString(document.Content);
 
-        var result = new DocumentReadResult(
-            text,
-            null);
-
-        return Task.FromResult(result);
+        return Task.FromResult(
+            new DocumentReaderResult(
+                text,
+                new Dictionary<string, string>
+                {
+                    ["Reader"] = "Text",
+                    ["FileName"] = document.FileName,
+                    ["ContentType"] = document.ContentType
+                }));
     }
 }

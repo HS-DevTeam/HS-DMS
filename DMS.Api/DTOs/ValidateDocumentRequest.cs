@@ -1,5 +1,3 @@
-using DMS.Domain.Documents;
-
 namespace DMS.Api.Contracts;
 
 /// <summary>
@@ -14,14 +12,21 @@ public sealed class ValidateDocumentRequest
     /// Formatos suportados:
     /// - PDF
     /// - XLSX
-    /// - CSV (futuro)
-    /// - Imagens com OCR (futuro)
+    /// - CSV
+    /// - PNG
+    /// - JPG
+    /// - JPEG
+    /// - TIFF
     /// </remarks>
     public IFormFile File { get; set; } = null!;
 
     /// <summary>
+    /// Tenant que está a submeter o documento.
+    /// </summary>
+    public Guid TenantId { get; set; }
+
+    /// <summary>
     /// Tipo documental esperado.
     /// </summary>
-    /// <example>CommercialCertificate</example>
-    public DocType ExpectedType { get; set; }
+    public Guid ExpectedDocumentTypeId { get; set; }
 }

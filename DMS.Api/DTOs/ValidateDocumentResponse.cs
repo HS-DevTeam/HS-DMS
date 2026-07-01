@@ -6,16 +6,24 @@ namespace DMS.Api.Contracts;
 public sealed class ValidateDocumentResponse
 {
     /// <summary>
-    /// Tipo documental esperado pelo consumidor da API.
+    /// Identificador do tipo documental esperado.
     /// </summary>
-    /// <example>CommercialCertificate</example>
-    public string ExpectedType { get; init; } = string.Empty;
+    public Guid ExpectedDocumentTypeId { get; init; }
 
     /// <summary>
-    /// Tipo documental identificado pelo analisador.
+    /// Nome do tipo documental esperado.
     /// </summary>
-    /// <example>CommercialCertificate</example>
-    public string DetectedType { get; init; } = string.Empty;
+    public string ExpectedDocumentTypeName { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Identificador do tipo documental detetado.
+    /// </summary>
+    public Guid? DetectedDocumentTypeId { get; init; }
+
+    /// <summary>
+    /// Nome do tipo documental identificado pelo analisador.
+    /// </summary>
+    public string? DetectedDocumentTypeName { get; init; }
 
     /// <summary>
     /// Nível de confiança da classificação.
@@ -31,10 +39,15 @@ public sealed class ValidateDocumentResponse
     public bool Accepted { get; init; }
 
     /// <summary>
+    /// Keywords encontradas durante a análise.
+    /// </summary>
+    public IReadOnlyCollection<string> MatchedKeywords { get; init; }
+        = Array.Empty<string>();
+
+    /// <summary>
     /// Lista de motivos de rejeição.
     /// Vazia quando o documento é aceite.
     /// </summary>
-    /// <example>["TYPE_MISMATCH"]</example>
     public IReadOnlyCollection<string> Reasons { get; init; }
         = Array.Empty<string>();
 }

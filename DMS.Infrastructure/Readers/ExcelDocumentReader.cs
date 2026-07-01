@@ -8,45 +8,56 @@ namespace DMS.Infrastructure.Readers;
 
 public sealed class ExcelDocumentReader : IDocumentReader
 {
-   public Task<DocumentReadResult> ReadAsync(
-    UploadedDocument document,
-    CancellationToken cancellationToken = default)
-{
-    cancellationToken.ThrowIfCancellationRequested();
-
-    using var stream = new MemoryStream(document.Content);
-    using var workbook = new XLWorkbook(stream);
-
-    var sb = new StringBuilder();
-
-    foreach (var worksheet in workbook.Worksheets)
+    public Task<DocumentReaderResult> ReadAsync(
+        UploadedDocument document,
+        CancellationToken cancellationToken = default)
     {
-        sb.AppendLine($"=== Sheet: {worksheet.Name} ===");
+        cancellationToken.ThrowIfCancellationRequested();
 
-        var usedRange = worksheet.RangeUsed();
-        if (usedRange == null)
-            continue;
+        using var stream = new MemoryStream(document.Content);
+        using var workbook = new XLWorkbook(stream);
 
-        foreach (var row in usedRange.RowsUsed())
+        var sb = new StringBuilder();
+
+        foreach (var worksheet in workbook.Worksheets)
         {
-            foreach (var cell in row.Cells())
+            sb.AppendLine($"=== Sheet: {worksheet.Name} ===");
+
+            var usedRange = worksheet.RangeUsed();
+
+            if (usedRange is null)
+                continue;
+
+            foreach (var row in usedRange.RowsUsed())
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var value = cell.GetFormattedString();
+                foreach (var cell in row.Cells())
+                {
+                    var value = cell.GetFormattedString();
 
-                if (!string.IsNullOrWhiteSpace(value))
-                    sb.Append(value + "\t");
+                    if (!string.IsNullOrWhiteSpace(value))
+                    {
+                        sb.Append(value);
+                        sb.Append('\t');
+                    }
+                }
+
+                sb.AppendLine();
             }
 
             sb.AppendLine();
         }
 
-        sb.AppendLine();
+        return Task.FromResult(
+            new DocumentReaderResult(
+                sb.ToString(),
+                new Dictionary<string, string>
+                {
+                    ["Reader"] = "Excel",
+                    ["FileName"] = document.FileName
+                }
+            )
+        );
     }
-
-    return Task.FromResult(
-        new DocumentReadResult(sb.ToString(), null)
-    );
-}
 }

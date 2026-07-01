@@ -1,10 +1,10 @@
 
 using DMS.Domain.Documents;
+using DMS.Domain.ValueObjects;
 
-namespace DMS.Application.Contracts
+namespace DMS.Application.Contracts;
+
+public interface IDocumentSchemaProvider
 {
-    public interface IDocumentSchemaProvider
-    {
-        IReadOnlyList<DocumentSchema> GetAll();
-    }
+    IReadOnlyList<DocumentSchema> GetAll();
 }
