@@ -1,19 +1,18 @@
 using UglyToad.PdfPig;
 using DMS.Application.Contracts;
 using DMS.Domain.Documents;
-using System.Text;
 using DMS.Application.Results;
+using System.Text;
 
 namespace DMS.Infrastructure.Readers;
 
 public sealed class PdfDocumentReader : IDocumentReader
 {
-    private readonly OcrDocumentReader _ocrReader;
+    private readonly IOcrService _ocr;
 
-    // Injetamos o leitor de OCR para usar caso o PDF seja um scan sem texto nativo
-    public PdfDocumentReader(OcrDocumentReader ocrReader)
+    public PdfDocumentReader(IOcrService ocr)
     {
-        _ocrReader = ocrReader;
+        _ocr = ocr;
     }
 
     public async Task<DocumentReadResult> ReadAsync(
@@ -33,13 +32,15 @@ public sealed class PdfDocumentReader : IDocumentReader
 
         var extractedText = sb.ToString();
 
-        // Se o PDF tiver texto nativo, devolvemos imediatamente (Performance ideal)
-        if (!string.IsNullOrWhiteSpace(extractedText.Replace("\r", "").Replace("\n", "").Trim()))
+        // PDF com texto normal
+        if (!string.IsNullOrWhiteSpace(extractedText.Trim()))
         {
-            return new DocumentReadResult(extractedText, null);
+            return new DocumentReadResult(extractedText);
         }
 
-        // Se o texto veio vazio, é um PDF escaneado. Ativamos o OCR pesado.
-        return await _ocrReader.ReadAsync(document, cancellationToken);
+        // PDF escaneado → OCR
+        var ocrText = _ocr.ExtractText(document.Content, document.ContentType);
+
+        return new DocumentReadResult(ocrText);
     }
 }

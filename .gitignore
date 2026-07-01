@@ -1,6 +1,7 @@
 # Build
 bin/
 obj/
+python/.venv*
 
 # Visual Studio
 .vs/

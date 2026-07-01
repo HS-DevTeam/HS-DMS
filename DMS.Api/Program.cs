@@ -7,6 +7,8 @@ using DMS.Infrastructure.Readers;
 using DMS.Api.Configs; // Namespace onde criou o ConfigureSwaggerOptions
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using DMS.Infrastructure.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,10 +48,8 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddScoped<IDocumentValidationService, DocumentValidationService>();
 builder.Services.AddScoped<TextDocumentReader>();
 builder.Services.AddScoped<ExcelDocumentReader>();
-builder.Services.AddScoped(sp => new OcrDocumentReader(
-    tessDataPath: Path.Combine(AppContext.BaseDirectory, "tessdata"),
-    language: "por"
-));
+builder.Services.AddScoped<IOcrService, TesseractCliOcrService>();
+builder.Services.AddScoped<IDocumentProcessingPipeline, DocumentProcessingPipeline>();
 builder.Services.AddScoped<PdfDocumentReader>();
 builder.Services.AddScoped<IDocumentReader, CompositeDocumentReader>();
 builder.Services.AddScoped<IDocumentAnalyzer, RuleBasedDocumentAnalyzer>();

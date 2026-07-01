@@ -38,5 +38,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\test_sample.png" CopyToOutputDirectory="Always" />
+  </ItemGroup>
 
 </Project>
